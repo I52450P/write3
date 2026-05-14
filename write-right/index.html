@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WriteRight - 中式英语改写</title>
+    <style>
+        :root, [data-theme="minimal"] {
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #888888;
+            --border: #e0e0e0;
+            --button-bg: #222222;
+            --button-text: #ffffff;
+            --button-hover: #000000;
+            --quote-border: #eeeeee;
+            --quote-text: #555555;
+            --quote-author: #999999;
+            --quote-trans: #666666;
+            --focus-border: #aaaaaa;
+            --heading-color: #333333;
+        }
+        [data-theme="sci-fi"] {
+            --bg: #0a0a14;
+            --card-bg: #111122;
+            --text: #cccccc;
+            --text-light: #8888aa;
+            --border: #333355;
+            --button-bg: #00ff88;
+            --button-text: #000000;
+            --button-hover: #00cc66;
+            --quote-border: #222244;
+            --quote-text: #aaccff;
+            --quote-author: #667799;
+            --quote-trans: #8899bb;
+            --focus-border: #00ff88;
+            --heading-color: #00ff88;
+        }
+        [data-theme="fresh"] {
+            --bg: #f5faf5;
+            --card-bg: #ffffff;
+            --text: #4a6b4a;
+            --text-light: #7a9a7a;
+            --border: #c8e6c9;
+            --button-bg: #81c784;
+            --button-text: #ffffff;
+            --button-hover: #66bb6a;
+            --quote-border: #e8f5e9;
+            --quote-text: #558b55;
+            --quote-author: #88aa88;
+            --quote-trans: #779977;
+            --focus-border: #81c784;
+            --heading-color: #66bb6a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container { flex: 1; max-width: 640px; margin: 60px auto 0; padding: 32px 24px; }
+        h1 { font-size: 28px; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.5px; color: var(--heading-color); transition: color 0.3s; }
+        .subtitle { font-size: 15px; color: var(--text-light); margin-bottom: 32px; transition: color 0.3s; }
+        textarea {
+            width: 100%; height: 130px; padding: 16px; font-size: 16px;
+            border: 1px solid var(--border); border-radius: 6px; resize: vertical;
+            background: var(--card-bg); color: var(--text);
+            transition: border 0.2s, background 0.3s, color 0.3s; font-family: inherit;
+        }
+        textarea:focus { outline: none; border-color: var(--focus-border); }
+        button {
+            margin-top: 16px; padding: 10px 28px; font-size: 15px;
+            background: var(--button-bg); color: var(--button-text); border: none;
+            border-radius: 6px; cursor: pointer; transition: background 0.2s, color 0.2s;
+        }
+        button:hover { background: var(--button-hover); }
+        #result {
+            margin-top: 28px; white-space: pre-wrap; background: var(--card-bg);
+            padding: 20px; border-radius: 6px; border: 1px solid var(--border);
+            line-height: 1.6; font-size: 15px; color: var(--text);
+            transition: background 0.3s, border 0.3s, color 0.3s;
+        }
+        .quote-box {
+            border-top: 1px solid var(--quote-border); padding: 24px 20px 28px;
+            margin-top: 48px; max-width: 640px; margin-left: auto; margin-right: auto;
+            text-align: center; width: 100%; transition: border-color 0.3s;
+        }
+        .quote-text { font-style: italic; font-size: 16px; color: var(--quote-text); margin-bottom: 6px; line-height: 1.5; transition: color 0.3s; }
+        .quote-author { font-size: 13px; color: var(--quote-author); margin-bottom: 8px; transition: color 0.3s; }
+        .quote-translation { font-size: 14px; color: var(--quote-trans); transition: color 0.3s; }
+        .theme-switcher {
+            position: fixed; top: 16px; left: 16px; z-index: 1000;
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 8px; padding: 6px; display: flex; gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: background 0.3s, border 0.3s;
+        }
+        .theme-btn {
+            padding: 6px 14px; font-size: 13px; border: none; background: transparent;
+            color: var(--text-light); border-radius: 4px; cursor: pointer;
+            transition: background 0.2s, color 0.2s; font-weight: 500;
+        }
+        .theme-btn:hover { background: var(--border); }
+        .theme-btn.active { background: var(--button-bg); color: var(--button-text); }
+        [data-theme="sci-fi"] textarea:focus, [data-theme="sci-fi"] button { box-shadow: 0 0 10px rgba(0,255,136,0.5); }
+        [data-theme="fresh"] textarea, [data-theme="fresh"] button, [data-theme="fresh"] #result { border-radius: 12px; }
+    </style>
+</head>
+<body data-theme="minimal">
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="minimal">🌿 简约</button>
+        <button class="theme-btn" data-theme="sci-fi">🚀 科幻</button>
+        <button class="theme-btn" data-theme="fresh">🍃 清新</button>
+    </div>
+    <div class="container">
+        <h1>WriteRight</h1>
+        <p class="subtitle">把中式英语变成地道表达，附详细修改解释</p>
+        <textarea id="inputText" placeholder="输入英文句子..."></textarea>
+        <button onclick="convert()">开始改写</button>
+        <div id="result"></div>
+    </div>
+    <div class="quote-box">
+        <div id="dailyQuote"></div>
+    </div>
+
+    <script>
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        function setActiveTheme(theme) {
+            document.body.dataset.theme = theme;
+            themeBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.theme === theme));
+            localStorage.setItem('witeright-theme', theme);
+        }
+        themeBtns.forEach(btn => btn.addEventListener('click', () => setActiveTheme(btn.dataset.theme)));
+        const savedTheme = localStorage.getItem('witeright-theme') || 'minimal';
+        setActiveTheme(savedTheme);
+
+        async function convert() {
+            const input = document.getElementById("inputText").value.trim();
+            if (!input) return alert("请先输入英文句子");
+            document.getElementById("result").innerText = "改写中...";
+            try {
+                const response = await fetch("/.netlify/functions/rewrite", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ input })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "请求失败");
+                if (data.type === "correct") {
+                    document.getElementById("result").innerText = `✅ 输入正确！\n\n${data.encouragement}\n\n📘 建议：${data.suggestion}`;
+                } else {
+                    document.getElementById("result").innerText = data.result;
+                }
+            } catch (err) {
+                document.getElementById("result").innerText = "出错了：" + err.message;
+                console.error(err);
+            }
+        }
+
+        const quotes = [
+            { en: "The only way to do great work is to love what you do.", author: "Steve Jobs", zh: "成就一番伟业的唯一途径就是热爱自己的事业。" },
+            { en: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", zh: "困难之中，必有机遇。" },
+            { en: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt", zh: "就地取材，尽其所能。" },
+            { en: "It is never too late to be what you might have been.", author: "George Eliot", zh: "成为你可能成为的人，永远不会太晚。" },
+            { en: "Language is the road map of a culture.", author: "Rita Mae Brown", zh: "语言是文化的地图。" },
+            { en: "Words are, of course, the most powerful drug used by mankind.", author: "Rudyard Kipling", zh: "言语无疑是人类所使用的效力最大的药物。" },
+            { en: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle", zh: "我们重复做什么，就会成为什么样的人。卓越不是一种行为，而是一种习惯。" }
+        ];
+        function showRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const q = quotes[randomIndex];
+            document.getElementById("dailyQuote").innerHTML = `<p class="quote-text">"${q.en}"</p><p class="quote-author">— ${q.author}</p><p class="quote-translation">${q.zh}</p>`;
+        }
+        window.onload = showRandomQuote;
+    </script>
+</body>
+</html>
